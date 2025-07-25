@@ -59,7 +59,7 @@ function App() {
         <FolderProvider>
           <ImageProvider>
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/" element={<Dashboard />} />
               <Route
                 path="/login"
                 element={
@@ -76,15 +76,7 @@ function App() {
                   </PublicRoute>
                 }
               />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </ImageProvider>
         </FolderProvider>

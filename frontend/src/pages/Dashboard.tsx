@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { FiFolder, FiUpload, FiSearch, FiLogOut, FiUser, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
@@ -261,6 +262,54 @@ const BreadcrumbItem = styled.span<{ $clickable?: boolean }>`
   }
 `;
 
+const WelcomeContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  text-align: center;
+  color: white;
+`;
+
+const WelcomeTitle = styled.h1`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+`;
+
+const WelcomeSubtitle = styled.p`
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+`;
+
+const AuthButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+`;
+
+const AuthButton = styled.button<{ $variant?: 'primary' | 'secondary' }>`
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: ${props => props.$variant === 'primary' ? 'white' : 'transparent'};
+  color: ${props => props.$variant === 'primary' ? '#667eea' : 'white'};
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    background: ${props => props.$variant === 'primary' ? '#f8f9ff' : 'white'};
+    color: #667eea;
+  }
+`;
+
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -372,6 +421,7 @@ const FileInput = styled.input`
 `;
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { folderTree, currentFolder, getFolderTree, getFolder, createFolder, deleteFolder } = useFolder();
   const { images, getImages, uploadImage, searchImages, deleteImage } = useImage();
@@ -387,6 +437,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const initializeFolders = async () => {
+      if (!user) return; // Don't load folders if user is not authenticated
       try {
         await getFolderTree();
       } catch (error) {
@@ -394,21 +445,20 @@ const Dashboard: React.FC = () => {
       }
     };
     initializeFolders();
-  }, [getFolderTree]);
+  }, [getFolderTree, user]);
 
   useEffect(() => {
     const loadFolderData = async () => {
-      if (selectedFolderId) {
-        try {
-          await getFolder(selectedFolderId);
-          await getImages(selectedFolderId);
-        } catch (error) {
-          console.error('Failed to load folder data:', error);
-        }
+      if (!user || !selectedFolderId) return; // Don't load folder data if user is not authenticated
+      try {
+        await getFolder(selectedFolderId);
+        await getImages(selectedFolderId);
+      } catch (error) {
+        console.error('Failed to load folder data:', error);
       }
     };
     loadFolderData();
-  }, [selectedFolderId, getFolder, getImages]);
+  }, [selectedFolderId, getFolder, getImages, user]);
 
   const handleFolderClick = (folderId: string) => {
     setSelectedFolderId(folderId);
@@ -511,6 +561,28 @@ const Dashboard: React.FC = () => {
       </div>
     ));
   };
+
+  // If user is not logged in, show welcome screen
+  if (!user) {
+    return (
+      <WelcomeContainer>
+        <WelcomeTitle>Welcome to ImageStore</WelcomeTitle>
+        <WelcomeSubtitle>
+          Organize and manage your images with ease. Create folders, upload images, and keep everything organized.
+        </WelcomeSubtitle>
+        <AuthButtons>
+          <AuthButton $variant="primary" onClick={() => navigate('/login')}>
+            <FiUser style={{ marginRight: '8px' }} />
+            Login
+          </AuthButton>
+          <AuthButton onClick={() => navigate('/signup')}>
+            <FiPlus style={{ marginRight: '8px' }} />
+            Sign Up
+          </AuthButton>
+        </AuthButtons>
+      </WelcomeContainer>
+    );
+  }
 
   return (
     <DashboardContainer>
