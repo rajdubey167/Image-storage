@@ -71,7 +71,7 @@ npm run dev
 
 ```
 PORT=5000
-MONGODB_URI=mongodb+srv://File:Pwzg2yCd1ez9lwnU@file.yolhzxu.mongodb.net/image-storage-app?retryWrites=true&w=majority&appName=File
+MONGODB_URI= SET YOUR URL
 JWT_SECRET=your_jwt_secret_key_here_change_this_in_production
 NODE_ENV=development
 ```
@@ -236,16 +236,4 @@ npm test        # Run tests
 
 ---
 
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-## 💬 Support
-
-Having issues? [Create an Issue](https://github.com/your-repo/issues) or connect with the maintainer.
-
----
-
-> Built with 💖 by passionate developers
+> Built with 💖 by Raj Dubey
